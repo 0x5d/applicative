@@ -44,4 +44,19 @@ class ApplicativeTest extends FunSuite with ScalaFutures with Matchers {
 
     whenReady(f)(_ shouldBe 3)
   }
+
+  test("Applicatives are good. They abstract the effect of applying independent computations sequentially") {
+    import com.co.castlecorp.scala.mde.cats.applicative.instances._
+
+    val name = "David"
+    val age = 24
+
+    val person = Person.build(name, age)(stringErrorOrAp)
+
+    person match {
+      case Right(p) =>
+        assert(p.name == name)
+        assert(p.age == age)
+    }
+  }
 }
