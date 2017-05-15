@@ -7,7 +7,7 @@ case class Person(name: String, age: Int)
 object Person {
 
   def build(name: String, age: Int)(implicit a: Applicative[StringErrorOr]) = {
-    a.ap2(a.pure( (a: String, n: Int) => Person(a, n)))(checkName("David"), checkAge(24))
+    a.ap2(a.pure( (a: String, n: Int) => Person(a, n)))(checkName(name), checkAge(age))
   }
 
   private def checkName(n: String): StringErrorOr[String] = {

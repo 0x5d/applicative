@@ -59,4 +59,17 @@ class ApplicativeTest extends FunSuite with ScalaFutures with Matchers {
         assert(p.age == age)
     }
   }
+
+  test("However, monads have limitations") {
+    import com.co.castlecorp.scala.mde.cats.applicative.instances._
+
+    val name = "" // Empty name
+    val age = -19 // This person doesn't exist yet! D:
+
+    val person = Person.build(name, age)(stringErrorOrAp)
+
+    person match {
+      case Left(s) => assert(s == "Name is empty") // We only get the first error! :(
+    }
+  }
 }
