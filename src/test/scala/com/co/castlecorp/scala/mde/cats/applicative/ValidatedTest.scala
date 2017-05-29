@@ -88,4 +88,47 @@ class ValidatedTest extends FunSuite {
         assert(errList.tail.head.message == "Impossibly short address")
     }
   }
+
+  val registrations = Map(
+    1 -> ClientRegistration("Charlie", 25, "Pony Ave"),
+    2 -> ClientRegistration("Compay Brito", 70, "El desierto")
+  )
+
+  test("Cool tool #1: traverse (1)") {
+    val res = List(1, 2).traverse(registrations.get)
+
+    res match {
+      case Some(rs) => assert(rs.length == 2)
+    }
+  }
+
+  test("Cool tool #1: traverse (2)") {
+    val res = List(1, 2, 3).traverse(registrations.get)
+
+    res match {
+      case None => assert(true)
+    }
+  }
+
+  test("Cool tool #2: sequence (1)") {
+    val res = List(
+      registrations.get(1),
+      registrations.get(2)
+    ).sequence
+
+    res match {
+      case Some(rs) => assert(rs.length == 2)
+    }
+  }
+
+  test("Cool tool #2: sequence (2)") {
+    val res = List(
+      registrations.get(1),
+      registrations.get(5)
+    ).sequence
+
+    res match {
+      case None => assert(true)
+    }
+  }
 }
