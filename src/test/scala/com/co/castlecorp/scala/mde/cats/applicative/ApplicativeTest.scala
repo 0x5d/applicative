@@ -45,13 +45,34 @@ class ApplicativeTest extends FunSuite with ScalaFutures with Matchers {
     whenReady(f)(_ shouldBe 3)
   }
 
+  case class Person(name: String, age: Int)
+
+  object Person {
+
+    type StringErrorOr[R] = Either[String, R]
+
+    def build(name: String, age: Int)(implicit a: Applicative[StringErrorOr]) = {
+      a.ap2(a.pure( (a: String, n: Int) => Person(a, n)))(checkName(name), checkAge(age))
+    }
+
+    private def checkName(n: String): StringErrorOr[String] = {
+      if (n.isEmpty) Left("Name is empty")
+      else Right(n)
+    }
+
+    private def checkAge(a: Int): StringErrorOr[Int] = {
+      if (a < 0) Left("No embryos allowed")
+      else if (a > 110) Left("Go away, gramps")
+      else Right(a)
+    }
+  }
+
   test("Applicatives are good. They abstract the effect of applying independent computations sequentially") {
-    import com.co.castlecorp.scala.mde.cats.applicative.instances._
 
     val name = "David"
     val age = 24
 
-    val person = Person.build(name, age)(stringErrorOrAp)
+    val person = Person.build(name, age)
 
     person match {
       case Right(p) =>
@@ -61,12 +82,11 @@ class ApplicativeTest extends FunSuite with ScalaFutures with Matchers {
   }
 
   test("However, monads have limitations") {
-    import com.co.castlecorp.scala.mde.cats.applicative.instances._
 
     val name = "" // Empty name
     val age = -19 // This person doesn't exist yet! D:
 
-    val person = Person.build(name, age)(stringErrorOrAp)
+    val person = Person.build(name, age)
 
     person match {
       case Left(s) => assert(s == "Name is empty") // We only get the first error! :(
